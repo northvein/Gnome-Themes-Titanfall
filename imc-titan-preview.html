@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMC TITAN — GNOME Theme Preview</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;900&family=Share+Tech+Mono&display=swap');
+
+:root {
+  --bg-darkest:    #080c10;
+  --bg-dark:       #0d1117;
+  --bg-panel:      #111922;
+  --bg-surface:    #16202e;
+  --bg-elevated:   #1c2a3a;
+  --bg-hover:      #1f3248;
+
+  --border-subtle:  #1e3348;
+  --border-default: #254060;
+  --border-active:  #2e5c8a;
+
+  --cyan-dim:    #1a6b80;
+  --cyan-base:   #00c8e0;
+  --cyan-bright: #40e8ff;
+  --cyan-glow:   rgba(0,200,224,0.25);
+
+  --orange-base:   #e05c00;
+  --orange-bright: #ff8040;
+  --accent-green:  #00e080;
+  --accent-red:    #e02040;
+
+  --text-primary:   #c8dce8;
+  --text-secondary: #6a90a8;
+  --text-disabled:  #3a5468;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-darkest);
+  color: var(--text-primary);
+  font-family: 'Exo 2', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Scanline texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0) 0px,
+    rgba(0,0,0,0) 3px,
+    rgba(0,0,0,0.06) 3px,
+    rgba(0,0,0,0.06) 4px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* ── HEADER BAR ─────────────────────────────── */
+.headerbar {
+  background: var(--bg-darkest);
+  border-bottom: 1px solid var(--border-active);
+  box-shadow: inset 0 -1px 0 var(--cyan-dim), 0 2px 24px rgba(0,0,0,0.9);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  height: 38px;
+  gap: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.win-btn {
+  width: 22px; height: 22px;
+  border-radius: 2px;
+  border: 1px solid;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px;
+  font-family: 'Share Tech Mono', monospace;
+  transition: all 180ms;
+}
+.win-btn.close  { border-color: var(--accent-red);   color: var(--accent-red);   background: rgba(224,32,64,0.12); }
+.win-btn.min    { border-color: var(--orange-base);  color: var(--orange-base);  background: rgba(224,92,0,0.12); }
+.win-btn.max    { border-color: var(--cyan-base);    color: var(--cyan-base);    background: rgba(0,200,224,0.1); }
+.win-btn:hover  { filter: brightness(1.4); box-shadow: 0 0 10px currentColor; }
+
+.app-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--cyan-bright);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  flex: 1;
+  text-align: center;
+}
+
+.header-icon {
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 180ms;
+}
+.header-icon:hover {
+  border-color: var(--cyan-base);
+  color: var(--cyan-bright);
+  box-shadow: 0 0 8px var(--cyan-glow);
+}
+
+/* ── TOP PANEL ──────────────────────────────── */
+.panel {
+  background: rgba(5,8,12,0.97);
+  border-bottom: 1px solid #1a3a50;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  height: 28px;
+  font-size: 10px;
+  font-family: 'Share Tech Mono', monospace;
+  gap: 0;
+  position: sticky;
+  top: 38px;
+  z-index: 99;
+}
+
+.panel-section { display: flex; align-items: center; gap: 4px; }
+.panel-left  { flex: 1; }
+.panel-right { flex: 1; justify-content: flex-end; }
+.panel-center { color: #c8dce8; letter-spacing: 0.1em; }
+
+.panel-btn {
+  color: var(--text-secondary);
+  padding: 0 10px;
+  height: 28px;
+  display: flex; align-items: center;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 150ms;
+  font-size: 10px;
+}
+.panel-btn:hover { color: var(--cyan-bright); border-bottom-color: var(--cyan-base); background: rgba(0,200,224,0.07); }
+.panel-btn.active { color: var(--cyan-bright); border-bottom-color: var(--cyan-bright); }
+
+.panel-indicator {
+  color: var(--text-secondary);
+  padding: 0 8px;
+  font-size: 10px;
+  display: flex; align-items: center; gap: 4px;
+}
+
+/* ── LAYOUT ─────────────────────────────────── */
+.layout {
+  display: flex;
+  height: calc(100vh - 66px);
+}
+
+/* ── SIDEBAR ─────────────────────────────────── */
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: var(--bg-darkest);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 9px;
+  color: var(--text-disabled);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-family: 'Share Tech Mono', monospace;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sidebar-header::before {
+  content: '';
+  width: 8px; height: 8px;
+  background: var(--cyan-base);
+  box-shadow: 0 0 8px var(--cyan-base);
+  display: block;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--cyan-base); }
+  50% { opacity: 0.4; box-shadow: 0 0 3px var(--cyan-base); }
+}
+
+.sidebar-item {
+  padding: 9px 16px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 150ms;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Share Tech Mono', monospace;
+}
+.sidebar-item .icon { color: var(--text-disabled); font-size: 13px; }
+.sidebar-item:hover { background: var(--bg-panel); color: var(--text-primary); }
+.sidebar-item.active {
+  background: var(--bg-surface);
+  color: var(--cyan-bright);
+  border-left-color: var(--cyan-base);
+  box-shadow: inset 0 0 20px rgba(0,200,224,0.05);
+}
+.sidebar-item.active .icon { color: var(--cyan-base); }
+
+.sidebar-group {
+  padding: 12px 16px 4px;
+  font-size: 8px;
+  color: var(--text-disabled);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* ── MAIN CONTENT ───────────────────────────── */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg-dark);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.main::-webkit-scrollbar { width: 4px; }
+.main::-webkit-scrollbar-track { background: var(--bg-darkest); }
+.main::-webkit-scrollbar-thumb { background: var(--border-active); }
+.main::-webkit-scrollbar-thumb:hover { background: var(--cyan-base); }
+
+/* ── SECTION HEADER ─────────────────────────── */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.section-label {
+  font-size: 9px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--cyan-base);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border-default), transparent);
+}
+
+/* ── CARDS ──────────────────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 2px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 200ms;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan-dim), transparent);
+}
+.card:hover { border-color: var(--border-active); }
+
+.card-title {
+  font-size: 11px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--cyan-bright);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title .dot {
+  width: 6px; height: 6px;
+  background: var(--cyan-base);
+  box-shadow: 0 0 6px var(--cyan-base);
+}
+
+.card-value {
+  font-size: 28px;
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.card-sub {
+  font-size: 9px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text-secondary);
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+}
+
+/* ── PROGRESS BARS ──────────────────────────── */
+.progress-block { margin-bottom: 16px; }
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 10px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text-secondary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.progress-label .val { color: var(--cyan-bright); }
+
+.progress-track {
+  height: 6px;
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-subtle);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  position: relative;
+  transition: width 1s ease;
+}
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 20px; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
+}
+
+.fill-cyan   { background: linear-gradient(90deg, var(--cyan-dim), var(--cyan-base)); box-shadow: 0 0 8px var(--cyan-glow); }
+.fill-orange { background: linear-gradient(90deg, #7a3800, var(--orange-base)); box-shadow: 0 0 8px rgba(224,92,0,0.3); }
+.fill-green  { background: linear-gradient(90deg, #005030, var(--accent-green)); box-shadow: 0 0 8px rgba(0,224,128,0.3); }
+.fill-red    { background: linear-gradient(90deg, #5a0a14, var(--accent-red)); box-shadow: 0 0 8px rgba(224,32,64,0.3); }
+
+/* ── WIDGET DEMOS ───────────────────────────── */
+.widget-demo {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 2px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.widget-demo::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan-dim), transparent);
+}
+
+/* Buttons */
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+.btn {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+  color: var(--text-primary);
+  padding: 7px 16px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 180ms;
+  position: relative;
+  overflow: hidden;
+}
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,200,224,0.08), transparent);
+  transition: left 400ms;
+}
+.btn:hover::after { left: 100%; }
+.btn:hover { border-color: var(--cyan-base); color: var(--cyan-bright); box-shadow: 0 0 12px var(--cyan-glow); }
+
+.btn.primary {
+  background: linear-gradient(135deg, #0a4060, #0d5070);
+  border-color: var(--cyan-base);
+  color: var(--cyan-bright);
+  box-shadow: 0 0 14px var(--cyan-glow);
+}
+.btn.primary:hover { box-shadow: 0 0 22px var(--cyan-glow); filter: brightness(1.15); }
+
+.btn.danger {
+  background: rgba(224,32,64,0.1);
+  border-color: var(--accent-red);
+  color: #ff6080;
+  box-shadow: 0 0 10px rgba(224,32,64,0.2);
+}
+
+.btn.warning {
+  background: rgba(224,92,0,0.1);
+  border-color: var(--orange-base);
+  color: var(--orange-bright);
+}
+
+/* Inputs */
+.input-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-field {
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+  color: var(--text-primary);
+  padding: 7px 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  outline: none;
+  transition: all 180ms;
+  width: 100%;
+}
+.input-field:focus {
+  border-color: var(--cyan-base);
+  box-shadow: 0 0 0 2px var(--cyan-glow), inset 0 0 12px rgba(0,0,0,0.3);
+}
+.input-field::placeholder { color: var(--text-disabled); letter-spacing: 0.06em; }
+
+/* Toggle switches */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.toggle-row:last-child { border-bottom: none; }
+.toggle-label {
+  font-size: 10px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text-secondary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.toggle {
+  width: 44px; height: 20px;
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+  position: relative;
+  cursor: pointer;
+  transition: all 250ms;
+}
+.toggle.on {
+  background: rgba(0,200,224,0.12);
+  border-color: var(--cyan-base);
+  box-shadow: 0 0 10px var(--cyan-glow);
+}
+.toggle-knob {
+  width: 16px; height: 16px;
+  background: var(--text-disabled);
+  border-radius: 1px;
+  position: absolute;
+  top: 1px; left: 1px;
+  transition: all 250ms;
+}
+.toggle.on .toggle-knob {
+  left: 25px;
+  background: var(--cyan-bright);
+  box-shadow: 0 0 8px var(--cyan-glow);
+}
+
+/* ── STATUS / HUD PANEL ─────────────────────── */
+.hud-panel {
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-active);
+  border-radius: 2px;
+  padding: 16px;
+  font-family: 'Share Tech Mono', monospace;
+  position: relative;
+  overflow: hidden;
+}
+
+.hud-panel::before {
+  content: 'IMC GROUND UNIT STATUS';
+  position: absolute;
+  top: 8px; left: 16px;
+  font-size: 8px;
+  color: var(--cyan-dim);
+  letter-spacing: 0.2em;
+}
+
+.hud-panel::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 40px; height: 40px;
+  background: linear-gradient(225deg, rgba(0,200,224,0.08), transparent);
+  clip-path: polygon(100% 0, 100% 100%, 0 0);
+}
+
+.hud-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.hud-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hud-stat-label {
+  font-size: 8px;
+  color: var(--text-disabled);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.hud-stat-value {
+  font-size: 20px;
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.hud-stat-value.online { color: var(--accent-green); text-shadow: 0 0 10px rgba(0,224,128,0.3); }
+.hud-stat-value.warn   { color: var(--orange-bright); text-shadow: 0 0 10px rgba(255,128,64,0.3); }
+.hud-stat-value.crit   { color: var(--accent-red); text-shadow: 0 0 10px rgba(224,32,64,0.3); }
+.hud-stat-value.cyan   { color: var(--cyan-bright); text-shadow: 0 0 10px rgba(64,232,255,0.3); }
+
+.hud-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-active), transparent);
+  margin: 10px 0;
+}
+
+/* ── NOTIFICATIONS ──────────────────────────── */
+.notif {
+  background: rgba(13,17,23,0.97);
+  border: 1px solid var(--border-active);
+  border-left: 3px solid var(--cyan-base);
+  border-radius: 2px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  font-family: 'Share Tech Mono', monospace;
+  animation: slideIn 400ms ease forwards;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(20px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+.notif.warn { border-left-color: var(--orange-base); }
+.notif.err  { border-left-color: var(--accent-red); }
+
+.notif-title {
+  font-size: 10px;
+  color: var(--cyan-bright);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.notif.warn .notif-title { color: var(--orange-bright); }
+.notif.err .notif-title  { color: #ff6080; }
+
+.notif-body {
+  font-size: 10px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ── MENU DEMO ──────────────────────────────── */
+.menu-demo {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-active);
+  border-radius: 2px;
+  padding: 4px 0;
+  width: 220px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.8), 0 0 0 1px var(--border-subtle);
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.menu-item {
+  padding: 7px 16px;
+  color: var(--text-primary);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 100ms;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.menu-item:hover {
+  background: var(--bg-hover);
+  color: var(--cyan-bright);
+  box-shadow: inset 3px 0 0 var(--cyan-base);
+}
+.menu-item.selected {
+  background: var(--bg-hover);
+  color: var(--cyan-bright);
+  box-shadow: inset 3px 0 0 var(--cyan-base);
+}
+.menu-item .shortcut {
+  margin-left: auto;
+  color: var(--text-disabled);
+  font-size: 9px;
+}
+
+.menu-separator {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 4px 0;
+}
+
+/* ── TABS ───────────────────────────────────── */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-panel);
+}
+.tab {
+  padding: 9px 18px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 180ms;
+}
+.tab:hover { color: var(--text-primary); }
+.tab.active {
+  color: var(--cyan-bright);
+  border-bottom-color: var(--cyan-base);
+  background: rgba(0,200,224,0.04);
+}
+
+.tab-content {
+  background: var(--bg-surface);
+  padding: 16px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  border: 1px solid var(--border-subtle);
+  border-top: none;
+}
+
+/* ── PALETTE ────────────────────────────────── */
+.palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.swatch-color {
+  width: 48px; height: 32px;
+  border-radius: 2px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.swatch-label {
+  font-size: 8px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text-disabled);
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+/* ── FOOTER ─────────────────────────────────── */
+.statusbar {
+  background: var(--bg-darkest);
+  border-top: 1px solid var(--border-subtle);
+  padding: 4px 16px;
+  font-size: 9px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text-disabled);
+  display: flex;
+  justify-content: space-between;
+  letter-spacing: 0.08em;
+  position: sticky;
+  bottom: 0;
+}
+.statusbar .status-ok  { color: var(--accent-green); }
+.statusbar .status-warn{ color: var(--orange-bright); }
+
+/* Animated scan line effect on panel */
+.panel-scan {
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,200,224,0.04), transparent);
+  animation: scanline 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes scanline {
+  0%   { left: -60%; }
+  100% { left: 120%; }
+}
+</style>
+</head>
+<body>
+
+<!-- GNOME SHELL top panel simulation -->
+<div class="panel" style="position:relative; overflow:hidden;">
+  <div class="panel-scan"></div>
+  <div class="panel-section panel-left">
+    <div class="panel-btn active">Activities</div>
+    <div class="panel-btn">Files</div>
+    <div class="panel-btn">Terminal</div>
+  </div>
+  <div class="panel-section panel-center">
+    <span style="font-size:11px; letter-spacing:0.12em;">SAT 14 JUN &nbsp;·&nbsp; 09:41:07</span>
+  </div>
+  <div class="panel-section panel-right">
+    <div class="panel-indicator">▲▼ 2.4MB/s</div>
+    <div class="panel-indicator">♦ 68%</div>
+    <div class="panel-indicator">⟁ 100%</div>
+    <div class="panel-indicator" style="color:var(--cyan-bright)">◎ EN</div>
+  </div>
+</div>
+
+<!-- APP WINDOW -->
+<div class="headerbar">
+  <div class="btn-row" style="gap:4px;">
+    <div class="win-btn close">✕</div>
+    <div class="win-btn min">−</div>
+    <div class="win-btn max">□</div>
+  </div>
+  <div class="app-title">⬡ IMC TITAN — THEME CONTROL CENTER</div>
+  <div class="header-icon">Search</div>
+  <div class="header-icon">Menu</div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active">Dashboard</div>
+  <div class="tab">Widgets</div>
+  <div class="tab">Palette</div>
+  <div class="tab">Notifications</div>
+</div>
+
+<!-- MAIN WINDOW BODY -->
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">NAVIGATION</div>
+    <div class="sidebar-group">System</div>
+    <div class="sidebar-item active">
+      <span class="icon">⬡</span> Overview
+    </div>
+    <div class="sidebar-item">
+      <span class="icon">◈</span> Appearance
+    </div>
+    <div class="sidebar-item">
+      <span class="icon">⟁</span> Performance
+    </div>
+    <div class="sidebar-group">Extensions</div>
+    <div class="sidebar-item">
+      <span class="icon">◎</span> Shell Theme
+    </div>
+    <div class="sidebar-item">
+      <span class="icon">▲</span> Dash to Dock
+    </div>
+    <div class="sidebar-item">
+      <span class="icon">◆</span> Blur FX
+    </div>
+    <div class="sidebar-group">Config</div>
+    <div class="sidebar-item">
+      <span class="icon">⊕</span> Fonts
+    </div>
+    <div class="sidebar-item">
+      <span class="icon">◇</span> Colors
+    </div>
+    <div class="sidebar-item">
+      <span class="icon">⊘</span> Advanced
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="main">
+
+    <!-- HUD STATUS CARDS -->
+    <div>
+      <div class="section-header">
+        <span class="section-label">// SYSTEM STATUS</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-title"><div class="dot"></div>CPU LOAD</div>
+          <div class="card-value" style="color:var(--accent-green);">24%</div>
+          <div class="card-sub">12 CORES · 4.8GHz · THERMAL OK</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><div class="dot" style="background:var(--orange-bright);box-shadow:0 0 6px var(--orange-bright);"></div>MEMORY</div>
+          <div class="card-value" style="color:var(--orange-bright);">11.4 GB</div>
+          <div class="card-sub">OF 32GB · SWAP 0MB · PRESSURE: LOW</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><div class="dot"></div>GPU VRAM</div>
+          <div class="card-value" style="color:var(--cyan-bright);">6.2 GB</div>
+          <div class="card-sub">RTX 4080 · DRIVER 555.42 · FAN 38%</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><div class="dot" style="background:var(--accent-green);box-shadow:0 0 6px var(--accent-green);"></div>NETWORK</div>
+          <div class="card-value" style="color:var(--accent-green);">↑ ONLINE</div>
+          <div class="card-sub">ETH0 · 1Gbit · PING 4ms</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRESS BARS -->
+    <div>
+      <div class="section-header">
+        <span class="section-label">// RESOURCE ALLOCATION</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="widget-demo">
+        <div class="progress-block">
+          <div class="progress-label"><span>SHIELD INTEGRITY</span><span class="val">87%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-cyan" style="width:87%"></div></div>
+        </div>
+        <div class="progress-block">
+          <div class="progress-label"><span>POWER CELL</span><span class="val" style="color:var(--orange-bright)">52%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-orange" style="width:52%"></div></div>
+        </div>
+        <div class="progress-block">
+          <div class="progress-label"><span>CORE TEMP</span><span class="val" style="color:var(--accent-green)">NOMINAL</span></div>
+          <div class="progress-track"><div class="progress-fill fill-green" style="width:34%"></div></div>
+        </div>
+        <div class="progress-block">
+          <div class="progress-label"><span>HULL BREACH RISK</span><span class="val" style="color:var(--accent-red)">CRITICAL</span></div>
+          <div class="progress-track"><div class="progress-fill fill-red" style="width:78%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUTTON + INPUT DEMOS -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div>
+        <div class="section-header">
+          <span class="section-label">// CONTROLS</span>
+          <div class="section-line"></div>
+        </div>
+        <div class="widget-demo">
+          <div class="btn-row">
+            <button class="btn primary">DEPLOY</button>
+            <button class="btn">CONFIG</button>
+            <button class="btn warning">STANDBY</button>
+            <button class="btn danger">ABORT</button>
+          </div>
+          <div class="input-demo">
+            <input class="input-field" type="text" placeholder="PILOT CALLSIGN...">
+            <input class="input-field" type="text" placeholder="SEARCH FRONTIER DATABASE..." value="BT-7274">
+          </div>
+          <div>
+            <div class="toggle-row">
+              <span class="toggle-label">AUTO-TITAN</span>
+              <div class="toggle on"><div class="toggle-knob"></div></div>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">CLOAK SYSTEM</span>
+              <div class="toggle"><div class="toggle-knob"></div></div>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">SMART PISTOL</span>
+              <div class="toggle on"><div class="toggle-knob"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-header">
+          <span class="section-label">// CONTEXT MENU</span>
+          <div class="section-line"></div>
+        </div>
+        <div class="menu-demo">
+          <div class="menu-item selected">⬡ &nbsp;New File <span class="shortcut">CTRL+N</span></div>
+          <div class="menu-item">◈ &nbsp;Open… <span class="shortcut">CTRL+O</span></div>
+          <div class="menu-separator"></div>
+          <div class="menu-item">▲ &nbsp;Save <span class="shortcut">CTRL+S</span></div>
+          <div class="menu-item">⟁ &nbsp;Save As… <span class="shortcut">SHIFT+CTRL+S</span></div>
+          <div class="menu-separator"></div>
+          <div class="menu-item">◎ &nbsp;Properties</div>
+          <div class="menu-item" style="color:var(--text-disabled); cursor:default;">◇ &nbsp;Export (Unavailable)</div>
+          <div class="menu-separator"></div>
+          <div class="menu-item" style="color:#ff6080;">⊘ &nbsp;Delete <span class="shortcut">DEL</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HUD + NOTIFS -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div>
+        <div class="section-header">
+          <span class="section-label">// TITAN HUD</span>
+          <div class="section-line"></div>
+        </div>
+        <div class="hud-panel">
+          <div class="hud-grid">
+            <div class="hud-stat">
+              <div class="hud-stat-label">UNIT STATUS</div>
+              <div class="hud-stat-value online">ACTIVE</div>
+            </div>
+            <div class="hud-stat">
+              <div class="hud-stat-label">TITAN CLASS</div>
+              <div class="hud-stat-value cyan">NORTHSTAR</div>
+            </div>
+            <div class="hud-stat">
+              <div class="hud-stat-label">HULL INTEGRITY</div>
+              <div class="hud-stat-value warn">62%</div>
+            </div>
+            <div class="hud-stat">
+              <div class="hud-stat-label">THREAT LEVEL</div>
+              <div class="hud-stat-value crit">EXTREME</div>
+            </div>
+          </div>
+          <div class="hud-divider"></div>
+          <div style="font-size:9px;color:var(--text-disabled);letter-spacing:0.12em;">
+            PILOT BOND: BT-7274 · TRUST PROTOCOL ACTIVE
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-header">
+          <span class="section-label">// SYSTEM ALERTS</span>
+          <div class="section-line"></div>
+        </div>
+        <div class="notif">
+          <div class="notif-title">⬡ THEME APPLIED</div>
+          <div class="notif-body">IMC-Titan GTK theme activated. All interface systems nominal.</div>
+        </div>
+        <div class="notif warn">
+          <div class="notif-title">▲ FONT WARNING</div>
+          <div class="notif-body">Share Tech Mono not detected. Falling back to system monospace.</div>
+        </div>
+        <div class="notif err">
+          <div class="notif-title">⊘ SHELL THEME</div>
+          <div class="notif-body">User Themes extension required for GNOME Shell styling.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLOR PALETTE -->
+    <div>
+      <div class="section-header">
+        <span class="section-label">// COLOR PALETTE</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="widget-demo">
+        <div class="palette">
+          <div class="swatch"><div class="swatch-color" style="background:#080c10;"></div><div class="swatch-label">#080c10<br>bg-darkest</div></div>
+          <div class="swatch"><div class="swatch-color" style="background:#0d1117;"></div><div class="swatch-label">#0d1117<br>bg-dark</div></div>
+          <div class="swatch"><div class="swatch-color" style="background:#111922;"></div><div class="swatch-label">#111922<br>bg-panel</div></div>
+          <div class="swatch"><div class="swatch-color" style="background:#1c2a3a;"></div><div class="swatch-label">#1c2a3a<br>bg-elevated</div></div>
+          <div class="swatch"><div class="swatch-color" style="background:#254060;"></div><div class="swatch-label">#254060<br>border</div></div>
+          <div class="swatch"><div class="swatch-color" style="background:#1a6b80; box-shadow:0 0 8px #1a6b80;"></div><div class="swatch-label">#1a6b80<br>cyan-dim</div></div>
+          <div class="swatch"><div class="swatch-color" style="background:#00c8e0; box-shadow:0 0 10px rgba(0,200,224,0.5);"></div><div class="swatch-label">#00c8e0<br>cyan-base</div></div>
+          <div class="swatch"><div class="swatch-color" style="background:#40e8ff; box-shadow:0 0 14px rgba(64,232,255,0.6);"></div><div class="swatch-label">#40e8ff<br>cyan-bright</div></div>
+          <div class="swatch"><div class="swatch-color" style="background:#e05c00; box-shadow:0 0 8px rgba(224,92,0,0.5);"></div><div class="swatch-label">#e05c00<br>orange</div></div>
+          <div class="swatch"><div class="swatch-color" style="background:#00e080; box-shadow:0 0 8px rgba(0,224,128,0.5);"></div><div class="swatch-label">#00e080<br>green</div></div>
+          <div class="swatch"><div class="swatch-color" style="background:#e02040; box-shadow:0 0 8px rgba(224,32,64,0.5);"></div><div class="swatch-label">#e02040<br>alert-red</div></div>
+          <div class="swatch"><div class="swatch-color" style="background:#c8dce8;"></div><div class="swatch-label">#c8dce8<br>text-primary</div></div>
+          <div class="swatch"><div class="swatch-color" style="background:#6a90a8;"></div><div class="swatch-label">#6a90a8<br>text-dim</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .main -->
+</div><!-- end .layout -->
+
+<!-- STATUS BAR -->
+<div class="statusbar">
+  <span>IMC TITAN v1.0.0 &nbsp;·&nbsp; GTK3/GTK4/GNOME-SHELL &nbsp;·&nbsp; <span class="status-ok">ALL SYSTEMS GO</span></span>
+  <span class="status-warn">⚠ INSTALL USER-THEMES EXTENSION FOR FULL SHELL SUPPORT</span>
+</div>
+
+<script>
+// Make tabs clickable
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+
+// Make sidebar items clickable
+document.querySelectorAll('.sidebar-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+  });
+});
+
+// Make menu items clickable
+document.querySelectorAll('.menu-item:not([style*="disabled"])').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('selected'));
+    item.classList.add('selected');
+  });
+});
+
+// Toggle switches
+document.querySelectorAll('.toggle').forEach(toggle => {
+  toggle.addEventListener('click', () => toggle.classList.toggle('on'));
+});
+
+// Animate progress bars on load
+document.querySelectorAll('.progress-fill').forEach(bar => {
+  const w = bar.style.width;
+  bar.style.width = '0';
+  setTimeout(() => bar.style.width = w, 200);
+});
+</script>
+</body>
+</html>
